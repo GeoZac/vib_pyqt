@@ -1,31 +1,34 @@
+
 from __future__ import division
 import sys
-from PyQt4 import QtGui, uic
 import matplotlib.pylab as pylab
 import scipy.integrate
 from pylab import arange, array
+from PyQt5 import uic
+from PyQt5.QtWidgets import QMainWindow, QApplication
 
-qtCreatorFile1 = "system_reponse.ui"  # Main Window.
-Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile1)
+Ui_MainWindow, QtBaseClass = uic.loadUiType("system_reponse.ui")
 
-qtCreatorFile2 = "widget.ui"  # Result Window.
-Ui_Widget, QtBaseClass1 = uic.loadUiType(qtCreatorFile2)
+Ui_Widget, QtBaseClass1 = uic.loadUiType("widget.ui")
 
 
-class MyDia(QtGui.QMainWindow, Ui_Widget):
+class MyDia(QMainWindow, Ui_Widget):
     def __init__(self):
-        QtGui.QMainWindow.__init__(self)
-        Ui_MainWindow.__init__(self)
+        chkpt = 1
+        print(chkpt)
+        QMainWindow.__init__(self)
+        Ui_Widget.__init__(self)
         self.setupUi(self)
 
 
-class MyApp(QtGui.QMainWindow, Ui_MainWindow):
+class MyApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
-        QtGui.QMainWindow.__init__(self)
-        Ui_MainWindow.__init__(self)
+        super(MyApp, self).__init__()
+        self.ui = Ui_MainWindow()
         self.setupUi(self)
         self.start.clicked.connect(self.getresponse)
 
+        
     def getresponse(self):
         def func(state, t):
             x, xd = state  # displacement,x and velocity x'
@@ -39,17 +42,19 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
         m = float(self.mass.toPlainText())
         k = float(self.k.toPlainText())
         c = float(self.c.toPlainText())
+
         if self.ch.isChecked() == True:
             ch = 2
         else:
             ch = 0
         # ch = 2
-        x0 = float(self.id.value())     #Initial Displacement
-        v0 = float(self.iv.value())     #Initial Velocity
-        state0 = [x0, v0]               # initial conditions [x0 , v0]  [m, m/sec]
-        ti = float(self.ti.value())     # initial time
-        tf = float(self.tf.value())     # final time
-        step = 0.0001                   # time step
+
+        x0 = float(self.id.value())  # Initial Displacement
+        v0 = float(self.iv.value())  # Initial Velocity
+        state0 = [x0, v0]  # initial conditions [x0 , v0]  [m, m/sec]
+        ti = float(self.ti.value())  # initial time
+        tf = float(self.tf.value())  # final time
+        step = 0.0001  # time step
         t = arange(ti, tf, step)
         state = scipy.integrate.odeint(func, state0, t)
         x = array(state[:, [0]])
@@ -82,7 +87,8 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
 
 
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
+    print(chkpt)
     window = MyApp()
     window.show()
     sys.exit(app.exec_())
